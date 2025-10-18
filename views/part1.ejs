@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My App</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // <-- enable class-based dark mode
+            theme: {
+            extend: {},
+            }
+        }
+    </script>
+
+
+    <!-- Alpine.js CDN -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+
+    <!-- Optional custom styles -->
+    <style>
+      body {
+        font-family: "Instrument Sans", sans-serif;
+      }
+
+      .progress-bar-fill {
+        transition: width 0.5s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="antialiased bg-gray-100 dark:bg-gray-900">
+    <div
+      x-data="themeController()"
+      x-init="init()"
+      class="w-full text-gray-800 dark:text-gray-200"
+    >
+      <div class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+        <!-- Navigation Bar -->
+        <nav class="sticky top-0 z-10 bg-white shadow-md dark:bg-gray-800">
+          <div class="max-w-5xl px-4 mx-auto sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+              <a href="/" class="flex items-center">
+                <svg
+                  class="w-8 h-8 text-indigo-600 dark:text-indigo-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+                <span
+                  class="ml-3 text-xl font-bold text-gray-900 dark:text-white"
+                >
+                  <span class="block sm:hidden">EmTech 12</span>
+                  <span class="hidden sm:block"
+                    >Empowerment Technologies 12</span
+                  >
+                </span>
+              </a>
+              <div class="flex items-center">
+                <button
+                  @click="toggleTheme()"
+                  class="p-2 text-gray-500 rounded-full cursor-pointer dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                >
+                  <span class="sr-only">Toggle dark mode</span>
+                  <!-- Sun Icon -->
+                  <svg
+                    x-show="!isDarkMode"
+                    class="w-6 h-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
+                  </svg>
+                  <!-- Moon Icon -->
+                  <svg
+                    x-show="isDarkMode"
+                    class="w-6 h-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl" x-data="quiz({ questions: [] })" x-init="loadQuestions()">
+
+            <!-- Quiz Container -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8 transition-all duration-500"
+                x-show="!isQuizFinished()" x-transition>
+            
+            <!-- Header: Question Number and Score -->
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Question <span x-text="currentQuestionIndex + 1"></span> of <span x-text="questions.length"></span>
+                </p>
+                <p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-gray-700 px-3 py-1 rounded-full">
+                Score: <span x-text="score"></span>
+                </p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-6">
+                <div class="bg-indigo-600 dark:bg-indigo-400 h-2.5 rounded-full"
+                    :style="`width: ${((currentQuestionIndex + 1) / questions.length) * 100}%`"></div>
+            </div>
+
+            <!-- Question Text -->
+            <div class="mb-6">
+                <p class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white"
+                x-text="questions[currentQuestionIndex]?.question"></p>
+            </div>
+
+            <!-- Options -->
+            <div class="space-y-4">
+                <template x-for="(option, index) in questions[currentQuestionIndex]?.options" :key="index">
+                <button @click="selectAnswer(option)"
+                        :class="getOptionClass(option) + ' w-full text-left p-4 rounded-lg border border-gray-300 dark:border-gray-600 font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500'">
+                    <div class="flex items-center justify-between">
+                    <span x-text="option"></span>
+                    <span x-show="answered && getOptionClass(option).includes('bg-green-500')">
+                        <!-- Correct Icon -->
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </span>
+                    <span x-show="answered && getOptionClass(option).includes('bg-red-500')">
+                        <!-- Wrong Icon -->
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </span>
+                    </div>
+                </button>
+                </template>
+            </div>
+            </div>
+
+            <!-- Final Score Screen -->
+            <div class="text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-opacity duration-500"
+                x-show="isQuizFinished()" x-transition>
+            <svg class="w-24 h-24 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mt-4">Quiz Complete!</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">You've reached the end of the quiz.</p>
+            <p class="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mt-6">
+                Your Score: <span x-text="score"></span> / <span x-text="questions.length"></span>
+            </p>
+            <p class="text-xl font-medium mt-2" x-text="getFeedbackMessage()"></p>
+            <div class="mt-8 flex flex-col sm:flex-row sm:justify-center sm:gap-4">
+                <button @click="restartQuiz()"
+                        class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-gray-800">
+                Restart Quiz
+                </button>
+                <a href="/"
+                class="mt-4 sm:mt-0 w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:ring-offset-gray-800">
+                Return to Home
+                </a>
+            </div>
+            </div>
+
+        </div>
+        </main>
+        <footer class="text-center py-4 text-gray-600 dark:text-gray-400">
+          <p id="footer-text"></p>
+        </footer>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const year = new Date().getFullYear();
+        const name = "Grado";
+        document.getElementById(
+          "footer-text"
+        ).innerHTML = `&copy; ${year} ${name}. All rights reserved.`;
+      });
+    </script>
+
+    <!-- Scripts -->
+    <script>
+      function themeController() {
+        return {
+          isDarkMode: localStorage.getItem("theme") === "dark",
+          init() {
+            this.applyTheme();
+          },
+          toggleTheme() {
+            this.isDarkMode = !this.isDarkMode;
+            localStorage.setItem("theme", this.isDarkMode ? "dark" : "light");
+            this.applyTheme();
+          },
+          applyTheme() {
+            if (this.isDarkMode) document.documentElement.classList.add("dark");
+            else document.documentElement.classList.remove("dark");
+          },
+        };
+      }
+
+      function quiz(initialData) {
+        return {
+            questions: initialData.questions || [],
+            currentQuestionIndex: 0,
+            score: 0,
+            selectedAnswer: null,
+            answered: false,
+
+            async loadQuestions() {
+                try {
+                    const response = await fetch('questions.json'); // Make sure questions.json is in the same folder
+                    const data = await response.json();
+
+                    // 🔀 Shuffle the array randomly
+                    const shuffled = data.sort(() => Math.random() - 0.5);
+
+                    // Use Proxy as before
+                    this.questions = new Proxy(shuffled, {
+                        get(target, prop) {
+                            if (typeof prop === 'symbol') return target[prop];
+                            if (prop in target) return target[prop];
+                            if (String(parseInt(prop)) === prop && prop >= target.length)
+                                return { question: '', options: [] };
+                            return target[prop];
+                        }
+                    });
+
+                    console.log('Questions loaded and shuffled:', this.questions);
+
+                } catch (err) {
+                    console.error('Failed to load questions.json:', err);
+                }
+            },
+
+            isQuizFinished() {
+                return this.questions.length > 0 && this.currentQuestionIndex >= this.questions.length;
+            },
+
+            selectAnswer(option) {
+            if (this.answered) return;
+            this.answered = true;
+            this.selectedAnswer = option;
+            if (option === this.questions[this.currentQuestionIndex].answer) this.score++;
+            setTimeout(() => {
+                this.currentQuestionIndex++;
+                this.answered = false;
+                this.selectedAnswer = null;
+            }, 1500);
+            },
+
+            getOptionClass(option) {
+            if (!this.questions[this.currentQuestionIndex] || this.isQuizFinished()) return '';
+            const correctAnswer = this.questions[this.currentQuestionIndex].answer;
+            if (!this.answered) return 'bg-white dark:bg-gray-700 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer';
+            if (option === correctAnswer) return 'bg-green-500 text-white pointer-events-none';
+            if (this.selectedAnswer === option && option !== correctAnswer) return 'bg-red-500 text-white pointer-events-none';
+            return 'bg-white dark:bg-gray-700 pointer-events-none opacity-60';
+            },
+
+            restartQuiz() {
+            this.currentQuestionIndex = 0;
+            this.score = 0;
+            this.selectedAnswer = null;
+            this.answered = false;
+            },
+
+            getFeedbackMessage() {
+            if (this.questions.length === 0) return "Loading Quiz...";
+            const percentage = (this.score / this.questions.length) * 100;
+            if (percentage === 100) return "Perfect Score! Excellent work!";
+            if (percentage >= 80) return "Great job! You know your stuff.";
+            if (percentage >= 50) return "Good effort! A little more practice will help.";
+            return "Keep practicing! You can do better.";
+            }
+        }
+    }
+    </script>
+  </body>
+</html>

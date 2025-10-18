@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My App</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // <-- enable class-based dark mode
+            theme: {
+            extend: {},
+            }
+        }
+    </script>
+
+
+    <!-- Alpine.js CDN -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+
+    <!-- Optional custom styles -->
+    <style>
+      body {
+        font-family: "Instrument Sans", sans-serif;
+      }
+
+      .progress-bar-fill {
+        transition: width 0.5s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="antialiased bg-gray-100 dark:bg-gray-900">
+    <div
+      x-data="themeController()"
+      x-init="init()"
+      class="w-full text-gray-800 dark:text-gray-200"
+    >
+      <div class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+        <!-- Navigation Bar -->
+        <nav class="sticky top-0 z-10 bg-white shadow-md dark:bg-gray-800">
+          <div class="max-w-5xl px-4 mx-auto sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+              <a href="/" class="flex items-center">
+                <svg
+                  class="w-8 h-8 text-indigo-600 dark:text-indigo-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+                <span
+                  class="ml-3 text-xl font-bold text-gray-900 dark:text-white"
+                >
+                  <span class="block sm:hidden">EmTech 12</span>
+                  <span class="hidden sm:block"
+                    >Empowerment Technologies 12</span
+                  >
+                </span>
+              </a>
+              <div class="flex items-center">
+                <button
+                  @click="toggleTheme()"
+                  class="p-2 text-gray-500 rounded-full cursor-pointer dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                >
+                  <span class="sr-only">Toggle dark mode</span>
+                  <!-- Sun Icon -->
+                  <svg
+                    x-show="!isDarkMode"
+                    class="w-6 h-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
+                  </svg>
+                  <!-- Moon Icon -->
+                  <svg
+                    x-show="isDarkMode"
+                    class="w-6 h-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <main class="flex-grow flex items-center justify-center p-4">
+            <div class="w-full max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+
+                <h1 class="text-center text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">Part II: Enumeration</h1>
+                <p class="text-center text-gray-600 dark:text-gray-400 mb-6">Enumerate the 7 Core Principles of Graphics and Layout.</p>
+
+                <!-- Progress Bar and Score -->
+                <div class="flex justify-between items-center mb-2 font-semibold text-gray-700 dark:text-gray-300">
+                <span>Progress</span>
+                <span id="score-text">0 / 7 Found</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-8">
+                <div id="progress-bar-fill" class="progress-bar-fill bg-indigo-600 h-4 rounded-full" style="width:0%"></div>
+                </div>
+
+                <!-- Form Container -->
+                <div id="quiz-form-container">
+                <form id="quiz-form" class="mb-8">
+                    <div>
+                    <label for="answer-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Enter a Principle:</label>
+                    <div class="mt-1 flex gap-3">
+                        <input type="text" id="answer-input" oninput="this.value = this.value.toUpperCase()"
+                            class="block w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            autocomplete="off" autofocus>
+                        <button type="button" id="btn-submit"
+                                class="cursor-pointer inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                        Submit
+                        </button>
+                    </div>
+                    </div>
+                </form>
+                </div>
+
+                <!-- Feedback Container -->
+                <div id="feedback-container" class="hidden mb-6 p-4 rounded-md text-sm font-medium"></div>
+
+                <!-- Correct Answers Container -->
+                <div class="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Correct Answers Found:</h3>
+                <div id="correct-answers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <p id="empty-message" class="text-gray-500 italic p-3 col-span-full">No principles found yet. Start guessing!</p>
+                </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+                <button id="reset-button" type="button"
+                        class="cursor-pointer w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                    Reset Quiz
+                </button>
+                <a href="/" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    Return to Home
+                </a>
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="text-center py-4 text-gray-600 dark:text-gray-400">
+          <p id="footer-text"></p>
+        </footer>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const year = new Date().getFullYear();
+        const name = "Grado";
+        document.getElementById(
+          "footer-text"
+        ).innerHTML = `&copy; ${year} ${name}. All rights reserved.`;
+      });
+    </script>
+
+    <!-- Scripts -->
+    <script>
+      function themeController() {
+        return {
+          isDarkMode: localStorage.getItem("theme") === "dark",
+          init() {
+            this.applyTheme();
+          },
+          toggleTheme() {
+            this.isDarkMode = !this.isDarkMode;
+            localStorage.setItem("theme", this.isDarkMode ? "dark" : "light");
+            this.applyTheme();
+          },
+          applyTheme() {
+            if (this.isDarkMode) document.documentElement.classList.add("dark");
+            else document.documentElement.classList.remove("dark");
+          },
+        };
+      }
+
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const total = 7;
+        let guessed = JSON.parse(localStorage.getItem('correctly_guessed') || "[]");
+
+        const answerInput = document.getElementById('answer-input');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const correctAnswersContainer = document.getElementById('correct-answers-container');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const scoreText = document.getElementById('score-text');
+        const resetButton = document.getElementById('reset-button');
+        const formContainer = document.getElementById('quiz-form-container');
+
+        const principles = [
+            "BALANCE", "CONTRAST", "EMPHASIS", "UNITY", "PROXIMITY", "ALIGNMENT", "REPETITION"
+        ]; // Example principles
+
+        const showFeedback = (type, message) => {
+            feedbackContainer.className = `mb-6 p-4 rounded-md text-sm font-medium ${
+            type === 'success' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' :
+            type === 'error' ? 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100' :
+            'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
+            }`;
+            feedbackContainer.textContent = message;
+            feedbackContainer.classList.remove('hidden');
+        };
+
+        const updateUI = () => {
+            // Update correct answers
+            correctAnswersContainer.innerHTML = '';
+            if (guessed.length === 0) {
+            correctAnswersContainer.innerHTML = '<p id="empty-message" class="text-gray-500 italic p-3 col-span-full">No principles found yet. Start guessing!</p>';
+            } else {
+            guessed.forEach(item => {
+                correctAnswersContainer.innerHTML += `
+                <div class="p-3 bg-green-100 dark:bg-green-800 rounded-lg flex items-center">
+                    <svg class="w-5 h-5 text-green-600 dark:text-green-300 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="font-medium text-green-800 dark:text-green-200">${item}</span>
+                </div>`;
+            });
+            }
+
+            // Update score/progress
+            const score = guessed.length;
+            progressBarFill.style.width = `${(score / total) * 100}%`;
+            scoreText.textContent = `${score} / ${total} Found`;
+
+            // Hide form if complete
+            if (score === total) {
+            formContainer.classList.add('hidden');
+            resetButton.textContent = 'Play Again';
+            showFeedback('success', 'Congratulations! You found all principles.');
+            }
+        };
+
+        updateUI();
+
+        document.getElementById('btn-submit').addEventListener('click', () => {
+            const answer = answerInput.value.trim().toUpperCase();
+            if (!answer) return showFeedback('error', 'Please enter an answer.');
+            if (!principles.includes(answer)) return showFeedback('error', 'Incorrect principle.');
+            if (guessed.includes(answer)) return showFeedback('info', 'Already guessed.');
+
+            guessed.push(answer);
+            localStorage.setItem('correctly_guessed', JSON.stringify(guessed));
+            answerInput.value = '';
+            feedbackContainer.classList.add('hidden');
+            updateUI();
+        });
+
+        resetButton.addEventListener('click', () => {
+            guessed = [];
+            localStorage.removeItem('correctly_guessed');
+            formContainer.classList.remove('hidden');
+            resetButton.textContent = 'Reset Quiz';
+            feedbackContainer.classList.add('hidden');
+            updateUI();
+        });
+    });
+    </script>
+  </body>
+</html>
